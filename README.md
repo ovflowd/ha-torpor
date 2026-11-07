@@ -3,7 +3,6 @@
 <!-- ha-marketplace:exclude-start -->
 [![CI](https://github.com/ovflowd/ha-torpor/actions/workflows/ci.yml/badge.svg)](https://github.com/ovflowd/ha-torpor/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Open this repository in your Home Assistant Marketplace.](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=ovflowd&repository=ha-torpor&category=integration)
 <!-- ha-marketplace:exclude-end -->
 
 Home Assistant integration for Torpor: see, sleep, wake and dim your Linux PC.
@@ -29,8 +28,12 @@ Assistant token, and decides what Home Assistant may ask of it.
 
 ## Install
 
-1. Select the **Open Marketplace repository** badge above, or in the Marketplace add
-   `https://github.com/ovflowd/ha-torpor` as a custom repository of type **Integration**.
+<!-- ha-marketplace:exclude-start -->
+[![Open this repository in your Home Assistant Marketplace.](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=ovflowd&repository=ha-torpor&category=integration)
+<!-- ha-marketplace:exclude-end -->
+
+1. Select the button above, or in the Marketplace add `https://github.com/ovflowd/ha-torpor` as a
+   custom repository of type **Integration**.
 2. Download **Torpor**, and restart Home Assistant if the Marketplace asks you to.
 
 [docs/setup.md](docs/setup.md#install) says how updates arrive, and how to install by hand.

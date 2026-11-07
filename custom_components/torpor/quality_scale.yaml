@@ -1,0 +1,80 @@
+rules:
+  # Bronze
+  action-setup: done
+  appropriate-polling:
+    status: exempt
+    comment: Push only. The PC dials Home Assistant and pushes every change.
+  brands: done
+  common-modules: done
+  config-flow-test-coverage: done
+  config-flow: done
+  dependency-transparency:
+    status: exempt
+    comment: No requirements. The protocol module ships in the integration and is pinned by test vectors.
+  docs-actions: done
+  docs-high-level-description: done
+  docs-installation-instructions: done
+  docs-removal-instructions: done
+  entity-event-setup: done
+  entity-unique-id: done
+  has-entity-name: done
+  runtime-data: done
+  test-before-configure:
+    status: done
+    comment: Pairing proves the connection before the entry exists.
+  test-before-setup:
+    status: exempt
+    comment: A sleeping PC is the normal case, so setup never waits for it and never raises ConfigEntryNotReady.
+  unique-config-entry: done
+
+  # Silver
+  action-exceptions: done
+  config-entry-unloading: done
+  docs-configuration-parameters: done
+  docs-installation-parameters: done
+  entity-unavailable: done
+  integration-owner: done
+  log-when-unavailable: done
+  parallel-updates: done
+  reauthentication-flow:
+    status: exempt
+    comment: There is no credential to re-enter. A PC with an old key raises the stale_key repair, which points to Reconfigure.
+  test-coverage: done
+
+  # Gold
+  devices: done
+  diagnostics: done
+  discovery-update-info:
+    status: exempt
+    comment: The PC dials Home Assistant, so there is no address to update.
+  discovery:
+    status: todo
+    comment: mDNS discovery is deferred.
+  docs-data-update: done
+  docs-examples: done
+  docs-known-limitations: done
+  docs-supported-devices: done
+  docs-supported-functions: done
+  docs-troubleshooting: done
+  docs-use-cases: done
+  dynamic-devices:
+    status: exempt
+    comment: One device per PC. Displays come and go as entities on it.
+  entity-category: done
+  entity-device-class: done
+  entity-disabled-by-default: done
+  entity-translations: done
+  exception-translations: done
+  icon-translations: done
+  reconfiguration-flow: done
+  repair-issues: done
+  stale-devices:
+    status: done
+    comment: Entities of displays a connected PC no longer reports are removed.
+
+  # Platinum
+  async-dependency: done
+  inject-websession:
+    status: exempt
+    comment: Home Assistant never opens a connection; the PC dials in.
+  strict-typing: todo

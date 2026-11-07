@@ -1,0 +1,93 @@
+{
+  "entity": {
+    "binary_sensor": {
+      "agent": {
+        "default": "mdi:lan-disconnect",
+        "state": {
+          "on": "mdi:lan-connect"
+        }
+      },
+      "game": {
+        "default": "mdi:gamepad-variant-outline",
+        "state": {
+          "on": "mdi:gamepad-variant"
+        }
+      }
+    },
+    "button": {
+      "hibernate": {
+        "default": "mdi:snowflake"
+      },
+      "lock": {
+        "default": "mdi:lock"
+      },
+      "power_off": {
+        "default": "mdi:power"
+      },
+      "restart": {
+        "default": "mdi:restart"
+      },
+      "sleep": {
+        "default": "mdi:sleep"
+      },
+      "wake": {
+        "default": "mdi:power-on"
+      }
+    },
+    "event": {
+      "power": {
+        "default": "mdi:power-settings"
+      }
+    },
+    "number": {
+      "brightness": {
+        "default": "mdi:brightness-6"
+      }
+    },
+    "sensor": {
+      "last_boot": {
+        "default": "mdi:clock-start"
+      },
+      "sleep_blockers": {
+        "default": "mdi:sleep-off"
+      },
+      "state": {
+        "default": "mdi:desktop-tower-monitor",
+        "state": {
+          "asleep": "mdi:sleep",
+          "busy": "mdi:cog",
+          "idle": "mdi:desktop-tower",
+          "in_use": "mdi:account",
+          "off": "mdi:power-off",
+          "remote": "mdi:remote-desktop",
+          "restarting": "mdi:restart"
+        }
+      },
+      "mode": {
+        "default": "mdi:monitor-shimmer"
+      }
+    },
+    "switch": {
+      "auto_brightness": {
+        "default": "mdi:brightness-auto"
+      },
+      "keep_awake": {
+        "default": "mdi:coffee",
+        "state": {
+          "off": "mdi:coffee-off"
+        }
+      }
+    }
+  },
+  "services": {
+    "keep_awake": {
+      "service": "mdi:coffee"
+    },
+    "sleep": {
+      "service": "mdi:sleep"
+    },
+    "wake": {
+      "service": "mdi:power-on"
+    }
+  }
+}

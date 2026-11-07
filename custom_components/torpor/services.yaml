@@ -1,0 +1,38 @@
+wake:
+  fields:
+    device_id:
+      required: true
+      selector:
+        device:
+          integration: torpor
+    wait:
+      default: false
+      selector:
+        boolean:
+sleep:
+  fields:
+    device_id:
+      required: true
+      selector:
+        device:
+          integration: torpor
+    hibernate:
+      default: false
+      selector:
+        boolean:
+    force:
+      default: false
+      selector:
+        boolean:
+keep_awake:
+  target:
+    entity:
+      integration: torpor
+      domain: switch
+      device_class: switch
+  fields:
+    duration:
+      required: true
+      example: "02:00:00"
+      selector:
+        duration:

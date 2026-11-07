@@ -1,0 +1,505 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Pair a Linux PC",
+        "description": "Torpor has two halves: this integration, and the Torpor agent on your PC. Install the agent first, as its quick start explains: {docs}\n\nSelect Submit to get a one-time pairing code."
+      },
+      "reconfigure": {
+        "title": "Re-pair {name}",
+        "description": "Re-pairing gives {name} a new key, and the old key stops working when you finish. Use it after a reinstall, when the PC lost its key, or to replace the key.\n\nSelect Submit to get a one-time pairing code."
+      },
+      "pair": {
+        "title": "Enter the code on the PC"
+      },
+      "confirm": {
+        "title": "Is this your PC?",
+        "description": "A PC used the code:\n\n- Host name: **{hostname}**\n- OS: {os}\n- Agent: {agent}\n- Agent ID: {agent_id}\n- Fingerprint: **{fingerprint}**\n\n`torporctl pair` printed a host name and a fingerprint. If they match these, continue. If they don't, someone else used the code: cancel.",
+        "menu_options": {
+          "features": "This is my PC",
+          "finish": "This is my PC, finish re-pairing",
+          "cancel": "Cancel, this isn't my PC"
+        }
+      },
+      "features": {
+        "title": "Choose features",
+        "description": "Pick what Home Assistant does with this PC. You can change all of it later with Configure.\n\nNot offered by the PC right now:\n{unavailable}",
+        "sections": {
+          "modules": {
+            "name": "Features",
+            "description": "Only features the PC offers are listed.",
+            "data": {
+              "power": "Power",
+              "keep_awake": "Keep awake",
+              "wake": "Wake-on-LAN",
+              "brightness": "Brightness"
+            },
+            "data_description": {
+              "power": "Lock, Sleep, Hibernate, Power off and Restart buttons. The PC's torpor.conf decides which ones exist.",
+              "keep_awake": "A switch that stops the PC from going to sleep on its own.",
+              "wake": "A Wake button that sends a Wake-on-LAN magic packet.",
+              "brightness": "A brightness control for each display, and automatic brightness from a light sensor."
+            }
+          },
+          "wake": {
+            "name": "Wake-on-LAN",
+            "data": {
+              "macs": "Network cards",
+              "broadcast": "Broadcast address",
+              "port": "Port",
+              "timeout": "Wake timeout"
+            },
+            "data_description": {
+              "macs": "The network cards that get the magic packet. Pick the wired one with Wake-on-LAN armed.",
+              "broadcast": "Where the packet goes. 255.255.255.255 reaches your local network. If that doesn't work, use the network's own broadcast address, such as 192.168.1.255.",
+              "port": "The packet's UDP port. 9 is the usual one.",
+              "timeout": "How long to wait for the PC to connect before the wake counts as failed."
+            }
+          },
+          "keep_awake": {
+            "name": "Keep awake",
+            "data": {
+              "hours": "Hours"
+            },
+            "data_description": {
+              "hours": "How long the Keep awake switch stays on after you turn it on. 0 keeps it on until you turn it off."
+            }
+          },
+          "brightness": {
+            "name": "Automatic brightness",
+            "data": {
+              "lux_entity": "Light sensor",
+              "anchor_lux": "Anchor light level",
+              "anchor_pct": "Brightness at the anchor",
+              "slope": "Slope",
+              "floor": "Lowest brightness",
+              "ceiling": "Highest brightness",
+              "game_boost": "Game boost",
+              "modes": "Monitor modes"
+            },
+            "data_description": {
+              "lux_entity": "An illuminance sensor in the same room. Without one there is no automatic brightness.",
+              "anchor_lux": "The light level the curve is built around.",
+              "anchor_pct": "The brightness at the anchor light level.",
+              "slope": "How many points the brightness moves when the room gets ten times brighter or darker.",
+              "floor": "Automatic brightness never goes below this.",
+              "ceiling": "Automatic brightness never goes above this. It must be at least the lowest brightness.",
+              "game_boost": "Points added while a game runs, up to 100 %, even past the highest brightness. 0 turns it off. The PC's torpor.conf says what counts as a game.",
+              "modes": "For a monitor whose own menu changes how bright a percentage looks: one row per value of that setting's VCP code, each with its anchor. The PC reads the code with ddcutil and never writes it. Leave the value out of a row to only read the code, and watch the display's Mode sensor to learn its values. In the list, a row shows its display by ID: {mode_displays}."
+            }
+          },
+          "advanced": {
+            "name": "Advanced",
+            "data": {
+              "allow_remote": "Allow agents outside the local network"
+            },
+            "data_description": {
+              "allow_remote": "Let this PC connect from addresses that aren't local, such as through a VPN or Home Assistant Cloud. Pairing is always local only."
+            }
+          }
+        }
+      }
+    },
+    "progress": {
+      "pair": "On the PC, run:\n\n`{command}`\n\nand type this code when it asks:\n\n**{code}**\n\nThe code works once, for 15 minutes. Don't share it. This page moves on when the PC connects. Setup help: {docs}"
+    },
+    "error": {
+      "ceiling_below_floor": "The highest brightness must be at least the lowest brightness.",
+      "no_mac_selected": "Pick at least one network card for Wake-on-LAN, or turn Wake-on-LAN off.",
+      "invalid_broadcast": "The broadcast address must be an IPv4 address, such as 255.255.255.255.",
+      "invalid_mode_code": "A monitor mode's code must be a VCP code in hex, from 00 to FF, such as E1.",
+      "invalid_mode_value": "A monitor mode's value must be in hex, from 0000 to FFFF, such as 01.",
+      "mode_value_without_anchor": "Give each monitor mode with a value an anchor, and each anchor a value.",
+      "mode_codes_differ": "A display can have one mode code. Use the same code in all of its rows.",
+      "duplicate_mode_value": "A display has the same mode value in two rows."
+    },
+    "abort": {
+      "already_configured": "This PC is already paired. To re-pair it, select Reconfigure on its entry.",
+      "already_in_progress": "This PC is already being paired.",
+      "pairing_timeout": "The pairing code expired. Start again for a new code.",
+      "pairing_failed": "A PC sent a wrong proof for this code three times, so the code no longer works. Start again for a new code.",
+      "pairing_rejected": "Pairing cancelled. The PC stored no key.",
+      "pc_disconnected": "The PC disconnected before pairing finished, and stored no key. Start again.",
+      "wrong_pc": "That is a different PC from the one this entry belongs to. Add it as a new PC instead.",
+      "reconfigure_successful": "Re-paired. The PC is connecting with its new key."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Torpor options",
+        "description": "These settings use what {name} last reported, at {updated}, so they work while the PC sleeps. Saving reloads the integration, and the PC reconnects within seconds.\n\nNot offered by the PC right now:\n{unavailable}",
+        "sections": {
+          "modules": {
+            "name": "Features",
+            "description": "Only features the PC offers are listed.",
+            "data": {
+              "power": "Power",
+              "keep_awake": "Keep awake",
+              "wake": "Wake-on-LAN",
+              "brightness": "Brightness"
+            },
+            "data_description": {
+              "power": "Lock, Sleep, Hibernate, Power off and Restart buttons. The PC's torpor.conf decides which ones exist.",
+              "keep_awake": "A switch that stops the PC from going to sleep on its own.",
+              "wake": "A Wake button that sends a Wake-on-LAN magic packet.",
+              "brightness": "A brightness control for each display, and automatic brightness from a light sensor."
+            }
+          },
+          "wake": {
+            "name": "Wake-on-LAN",
+            "data": {
+              "macs": "Network cards",
+              "broadcast": "Broadcast address",
+              "port": "Port",
+              "timeout": "Wake timeout"
+            },
+            "data_description": {
+              "macs": "The network cards that get the magic packet. Pick the wired one with Wake-on-LAN armed.",
+              "broadcast": "Where the packet goes. 255.255.255.255 reaches your local network. If that doesn't work, use the network's own broadcast address, such as 192.168.1.255.",
+              "port": "The packet's UDP port. 9 is the usual one.",
+              "timeout": "How long to wait for the PC to connect before the wake counts as failed."
+            }
+          },
+          "keep_awake": {
+            "name": "Keep awake",
+            "data": {
+              "hours": "Hours"
+            },
+            "data_description": {
+              "hours": "How long the Keep awake switch stays on after you turn it on. 0 keeps it on until you turn it off."
+            }
+          },
+          "brightness": {
+            "name": "Automatic brightness",
+            "data": {
+              "lux_entity": "Light sensor",
+              "anchor_lux": "Anchor light level",
+              "anchor_pct": "Brightness at the anchor",
+              "slope": "Slope",
+              "floor": "Lowest brightness",
+              "ceiling": "Highest brightness",
+              "game_boost": "Game boost",
+              "modes": "Monitor modes"
+            },
+            "data_description": {
+              "lux_entity": "An illuminance sensor in the same room. Without one there is no automatic brightness.",
+              "anchor_lux": "The light level the curve is built around.",
+              "anchor_pct": "The brightness at the anchor light level.",
+              "slope": "How many points the brightness moves when the room gets ten times brighter or darker.",
+              "floor": "Automatic brightness never goes below this.",
+              "ceiling": "Automatic brightness never goes above this. It must be at least the lowest brightness.",
+              "game_boost": "Points added while a game runs, up to 100 %, even past the highest brightness. 0 turns it off. The PC's torpor.conf says what counts as a game.",
+              "modes": "For a monitor whose own menu changes how bright a percentage looks: one row per value of that setting's VCP code, each with its anchor. The PC reads the code with ddcutil and never writes it. Leave the value out of a row to only read the code, and watch the display's Mode sensor to learn its values. In the list, a row shows its display by ID: {mode_displays}."
+            }
+          },
+          "advanced": {
+            "name": "Advanced",
+            "data": {
+              "allow_remote": "Allow agents outside the local network"
+            },
+            "data_description": {
+              "allow_remote": "Let this PC connect from addresses that aren't local, such as through a VPN or Home Assistant Cloud. Pairing is always local only."
+            }
+          }
+        }
+      }
+    },
+    "error": {
+      "ceiling_below_floor": "The highest brightness must be at least the lowest brightness.",
+      "no_mac_selected": "Pick at least one network card for Wake-on-LAN, or turn Wake-on-LAN off.",
+      "invalid_broadcast": "The broadcast address must be an IPv4 address, such as 255.255.255.255.",
+      "invalid_mode_code": "A monitor mode's code must be a VCP code in hex, from 00 to FF, such as E1.",
+      "invalid_mode_value": "A monitor mode's value must be in hex, from 0000 to FFFF, such as 01.",
+      "mode_value_without_anchor": "Give each monitor mode with a value an anchor, and each anchor a value.",
+      "mode_codes_differ": "A display can have one mode code. Use the same code in all of its rows.",
+      "duplicate_mode_value": "A display has the same mode value in two rows."
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "agent": {
+        "name": "Agent"
+      },
+      "game": {
+        "name": "Game running"
+      }
+    },
+    "button": {
+      "hibernate": {
+        "name": "Hibernate"
+      },
+      "lock": {
+        "name": "Lock"
+      },
+      "power_off": {
+        "name": "Power off"
+      },
+      "restart": {
+        "name": "Restart"
+      },
+      "sleep": {
+        "name": "Sleep"
+      },
+      "wake": {
+        "name": "Wake"
+      }
+    },
+    "event": {
+      "power": {
+        "name": "Power",
+        "state_attributes": {
+          "event_type": {
+            "state": {
+              "suspending": "Suspending",
+              "shutting_down": "Shutting down",
+              "restarting": "Restarting",
+              "resumed": "Resumed",
+              "booted": "Booted",
+              "wake_succeeded": "Wake succeeded",
+              "wake_failed": "Wake failed"
+            }
+          }
+        }
+      }
+    },
+    "number": {
+      "brightness": {
+        "name": "{display} brightness"
+      }
+    },
+    "sensor": {
+      "last_boot": {
+        "name": "Last boot"
+      },
+      "sleep_blockers": {
+        "name": "Sleep blockers",
+        "state_attributes": {
+          "blockers": {
+            "name": "Blockers"
+          }
+        }
+      },
+      "state": {
+        "name": "State",
+        "state": {
+          "in_use": "In use",
+          "remote": "Remote",
+          "busy": "Busy",
+          "idle": "Idle",
+          "asleep": "Asleep",
+          "off": "Off",
+          "restarting": "Restarting"
+        },
+        "state_attributes": {
+          "session": {
+            "name": "Session",
+            "state": {
+              "unlocked": "Unlocked",
+              "locked": "Locked",
+              "login_screen": "Login screen",
+              "none": "None",
+              "unknown": "Unknown"
+            }
+          },
+          "display_on": {
+            "name": "Display on"
+          },
+          "remote": {
+            "name": "Remote"
+          },
+          "busy": {
+            "name": "Busy"
+          }
+        }
+      },
+      "mode": {
+        "name": "{display} mode",
+        "state_attributes": {
+          "code": {
+            "name": "Code"
+          },
+          "value": {
+            "name": "Value"
+          },
+          "error": {
+            "name": "Error"
+          }
+        }
+      }
+    },
+    "switch": {
+      "auto_brightness": {
+        "name": "{display} auto brightness",
+        "state_attributes": {
+          "overridden": {
+            "name": "Overridden"
+          },
+          "target": {
+            "name": "Target"
+          }
+        }
+      },
+      "keep_awake": {
+        "name": "Keep awake",
+        "state_attributes": {
+          "ends_at": {
+            "name": "Ends at"
+          }
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "error_not_allowed": {
+      "message": "The PC doesn't allow that. [allow] in its torpor.conf decides."
+    },
+    "error_disabled": {
+      "message": "That feature is turned off, on the PC or in the integration's options."
+    },
+    "error_unavailable": {
+      "message": "The PC can't do that right now: {message}"
+    },
+    "error_refused": {
+      "message": "The PC refused: {message}"
+    },
+    "error_observe_only": {
+      "message": "The PC's agent runs in observe-only mode, so it does nothing it is asked."
+    },
+    "error_bad_request": {
+      "message": "The PC didn't understand the request. Update the Torpor agent or this integration."
+    },
+    "error_failed": {
+      "message": "The PC tried and failed: {message}"
+    },
+    "error_busy": {
+      "message": "The PC is still busy with another power command."
+    },
+    "error_timeout": {
+      "message": "The PC didn't answer within 10 seconds."
+    },
+    "error_not_connected": {
+      "message": "The PC isn't connected."
+    },
+    "wake_not_set_up": {
+      "message": "Wake-on-LAN isn't set up for {name}. Turn it on and pick a network card in the integration's options."
+    },
+    "wake_send_failed": {
+      "message": "Couldn't send the magic packet: {error}"
+    },
+    "action_not_allowed": {
+      "message": "{name} doesn't offer {action}. Check the Power feature in the integration's options, and [allow] in the PC's torpor.conf."
+    }
+  },
+  "issues": {
+    "stale_key": {
+      "title": "{name} uses an old pairing key",
+      "description": "{name} keeps connecting with a key that Home Assistant no longer has, so it can't connect. This happens when a re-pairing didn't finish on the PC, or when the entry was deleted and added again.\n\nSelect Reconfigure on the {name} entry, then run `torporctl pair` on the PC."
+    },
+    "protocol_mismatch": {
+      "title": "{name} speaks another Torpor protocol version",
+      "description": "{name} connected with protocol version {proto}. This integration speaks version 1. Update the Torpor agent on the PC, or this integration, so both speak the same version. `torporctl --version` shows the agent's."
+    },
+    "wol_off": {
+      "title": "Wake-on-LAN is off on {name}",
+      "description": "The network cards selected for waking ({nics}) report Wake-on-LAN as off, so the Wake button can't wake {name}. Turn it on in the PC's firmware and network settings, as `docs/wake-on-lan.md` in the Torpor repository explains. `torporctl doctor` checks it."
+    },
+    "linger_off": {
+      "title": "{name} stops its agent when you log out",
+      "description": "Lingering is off for the user that runs the Torpor agent on {name}. The agent stops when that user logs out, and Home Assistant loses the PC until someone logs in again. On the PC, run `loginctl enable-linger`."
+    },
+    "module_unavailable_power": {
+      "title": "Power isn't available on {name}",
+      "description": "Power is turned on in the integration's options, but {name} reports it as off or unavailable: {problems}\n\nRun `torporctl doctor` on the PC to see why, or turn Power off in the options."
+    },
+    "module_unavailable_keep_awake": {
+      "title": "Keep awake isn't available on {name}",
+      "description": "Keep awake is turned on in the integration's options, but {name} reports it as off or unavailable: {problems}\n\nRun `torporctl doctor` on the PC to see why, or turn Keep awake off in the options."
+    },
+    "module_unavailable_wake": {
+      "title": "Wake-on-LAN isn't available on {name}",
+      "description": "Wake-on-LAN is turned on in the integration's options, but {name} reports it as off or unavailable: {problems}\n\nRun `torporctl doctor` on the PC to see why, or turn Wake-on-LAN off in the options."
+    },
+    "module_unavailable_brightness": {
+      "title": "Brightness isn't available on {name}",
+      "description": "Brightness is turned on in the integration's options, but {name} reports it as off or unavailable: {problems}\n\nRun `torporctl doctor` on the PC to see why, or turn Brightness off in the options."
+    },
+    "modes_unavailable": {
+      "title": "{name} can't read monitor modes",
+      "description": "A display of {name} has a mode code in the integration's options, but the PC can't read monitor modes: {problems}\n\nThe curve uses each display's lowest mode anchor until it can. Reading modes needs ddcutil 2.2 or later and access to /dev/i2c-*. Run `torporctl doctor` on the PC to see what's missing, or remove the monitor modes from the options."
+    },
+    "modes_agent_outdated": {
+      "title": "The agent on {name} can't read monitor modes",
+      "description": "A display of {name} has a mode code in the integration's options, but the Torpor agent on the PC is too old to read monitor modes. It ignores them and uses the curve's own anchor.\n\nUpdate the agent on the PC with `torporctl update` and a newer release, or remove the monitor modes from the options."
+    }
+  },
+  "services": {
+    "wake": {
+      "name": "Wake",
+      "description": "Wakes a PC with a Wake-on-LAN magic packet, unless it is already awake.",
+      "fields": {
+        "device_id": {
+          "name": "PC",
+          "description": "The PC, as a Torpor device."
+        },
+        "wait": {
+          "name": "Wait",
+          "description": "Wait until the PC connects or the wake timeout ends, and return awake or timeout."
+        }
+      }
+    },
+    "sleep": {
+      "name": "Sleep",
+      "description": "Suspends or hibernates a PC.",
+      "fields": {
+        "device_id": {
+          "name": "PC",
+          "description": "The PC, as a Torpor device."
+        },
+        "hibernate": {
+          "name": "Hibernate",
+          "description": "Hibernate instead of suspend. The PC must allow it."
+        },
+        "force": {
+          "name": "Force",
+          "description": "Sleep even when other apps ask the PC to stay awake. The system itself can still refuse."
+        }
+      }
+    },
+    "keep_awake": {
+      "name": "Keep awake",
+      "description": "Keeps a PC awake for a while.",
+      "fields": {
+        "duration": {
+          "name": "Duration",
+          "description": "How long. 0 keeps it awake until you turn Keep awake off."
+        }
+      }
+    }
+  },
+  "selector": {
+    "modes": {
+      "fields": {
+        "display": {
+          "name": "Display"
+        },
+        "code": {
+          "name": "Code",
+          "description": "The VCP code in hex, such as E1."
+        },
+        "value": {
+          "name": "Value",
+          "description": "One value of the code in hex, such as 01. Empty only reads the code."
+        },
+        "anchor_pct": {
+          "name": "Anchor",
+          "description": "The brightness at the anchor light level for this value."
+        },
+        "label": {
+          "name": "Label",
+          "description": "What the Mode sensor shows for this value, such as Power Saving."
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,14 @@
+# Pairing keys, diagnostics downloads and captures from real PCs (hostnames, MACs, monitor serials): never commit them
+*.key
+config_entry-torpor-*.json
+local/
+
+__pycache__/
+*.egg-info/
+build/
+dist/
+.venv/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/

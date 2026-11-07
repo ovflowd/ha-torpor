@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security problem
+    url: https://github.com/ovflowd/ha-torpor/security/advisories/new
+    about: Report it privately, not as an issue.
+  - name: A problem with the agent on the PC
+    url: https://github.com/ovflowd/torpor/issues/new/choose
+    about: torpord, torporctl and the protocol live in ovflowd/torpor.

@@ -1,0 +1,187 @@
+# serializer version: 1
+# name: test_diagnostics_redact_the_key_ids_macs_and_names
+  dict({
+    'connection': dict({
+      'close_code': None,
+      'close_reason': '',
+      'connected': True,
+      'connected_at': '2026-11-07T12:00:00+00:00',
+      'disconnected_at': None,
+      'going_down': None,
+      'handshakes': dict({
+        'ok': 1,
+      }),
+      'sessions': 1,
+    }),
+    'entry': dict({
+      'data': dict({
+        'agent_id': '**REDACTED**',
+        'capabilities': dict({
+          'host': dict({
+            'agent': '0.1.0',
+            'desktop': 'KDE',
+            'hostname': '**REDACTED**',
+            'kernel': '6.17.0-example',
+            'linger': True,
+            'model': 'Tower 5',
+            'os': 'Example Linux 1.0',
+            'python': '3.14.0',
+            'vendor': 'Example Computers',
+          }),
+          'modules': dict({
+            'brightness': dict({
+              'actions': dict({
+                'brightness': True,
+              }),
+              'available': True,
+              'backend': None,
+              'displays': list([
+                dict({
+                  'backend': 'kde',
+                  'id': '3f2a9c1b04de',
+                  'internal': False,
+                  'label': 'Example 27Q',
+                  'modes': True,
+                }),
+              ]),
+              'enabled': True,
+              'modes': dict({
+                'available': True,
+                'problems': list([
+                ]),
+              }),
+              'problems': list([
+              ]),
+            }),
+            'core': dict({
+              'available': True,
+              'backend': 'logind',
+              'enabled': True,
+              'games': list([
+              ]),
+              'problems': list([
+              ]),
+            }),
+            'keep_awake': dict({
+              'actions': dict({
+                'keep_awake': True,
+              }),
+              'available': True,
+              'backend': 'kde',
+              'enabled': True,
+              'problems': list([
+              ]),
+            }),
+            'power': dict({
+              'actions': dict({
+                'hibernate': True,
+                'lock': True,
+                'poweroff': True,
+                'reboot': True,
+                'suspend': True,
+              }),
+              'available': True,
+              'backend': 'logind',
+              'enabled': True,
+              'problems': list([
+              ]),
+            }),
+            'wake': dict({
+              'available': True,
+              'backend': None,
+              'enabled': True,
+              'nics': list([
+                dict({
+                  'kind': 'ethernet',
+                  'mac': '**REDACTED**',
+                  'name': 'enp5s0',
+                  'primary': True,
+                  'wol': 'armed',
+                }),
+                dict({
+                  'kind': 'wifi',
+                  'mac': '**REDACTED**',
+                  'name': 'wlp6s0',
+                  'primary': False,
+                  'wol': 'unknown',
+                }),
+              ]),
+              'problems': list([
+              ]),
+            }),
+          }),
+          'observe_only': False,
+        }),
+        'capabilities_at': '2026-11-07T12:00:00+00:00',
+        'key': '**REDACTED**',
+      }),
+      'options': dict({
+        'advanced': dict({
+          'allow_remote': False,
+        }),
+        'brightness': dict({
+          'anchor_lux': 100,
+          'anchor_pct': 40,
+          'ceiling': 80,
+          'floor': 10,
+          'game_boost': 30,
+          'modes': list([
+          ]),
+          'slope': 25,
+        }),
+        'keep_awake': dict({
+          'hours': 12,
+        }),
+        'modules': dict({
+          'brightness': True,
+          'keep_awake': True,
+          'power': True,
+          'wake': True,
+        }),
+        'wake': dict({
+          'broadcast': '**REDACTED**',
+          'macs': '**REDACTED**',
+          'port': 9,
+          'timeout': 120,
+        }),
+      }),
+      'title': '**REDACTED**',
+    }),
+    'ha_state': 'in_use',
+    'state': dict({
+      'boot_time': 1762500000,
+      'brightness': dict({
+        'displays': dict({
+          '3f2a9c1b04de': dict({
+            'auto': False,
+            'error': None,
+            'overridden': False,
+            'percent': 31,
+            'target': 31,
+          }),
+        }),
+        'lux': 84.0,
+      }),
+      'busy': list([
+      ]),
+      'display_on': True,
+      'keep_awake': dict({
+        'applied': False,
+        'backend': 'kde',
+        'on': False,
+        'remaining': None,
+      }),
+      'power': dict({
+        'blockers': list([
+        ]),
+        'can_hibernate': 'yes',
+        'can_suspend': 'yes',
+      }),
+      'remote': list([
+      ]),
+      'session': 'unlocked',
+      'state': 'in_use',
+      'type': 'state',
+    }),
+  })
+# ---

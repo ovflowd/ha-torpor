@@ -1,0 +1,58 @@
+name: Bug report
+description: Something does not work as the docs say
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Never paste your pairing code or your key. Download the diagnostics from the PC's device
+        page: they leave out the key, the agent ID, MAC addresses and the host name.
+  - type: input
+    id: integration
+    attributes:
+      label: Integration version
+      description: Shown on the Torpor entry, or in `custom_components/torpor/manifest.json`.
+      placeholder: 0.1.0
+    validations:
+      required: true
+  - type: input
+    id: agent
+    attributes:
+      label: Agent version
+      description: The output of `torporctl --version` on the PC.
+      placeholder: torporctl 0.1.0 (proto 1)
+    validations:
+      required: true
+  - type: input
+    id: home-assistant
+    attributes:
+      label: Home Assistant version and installation type
+      placeholder: 2026.11.0, Home Assistant OS
+    validations:
+      required: true
+  - type: input
+    id: system
+    attributes:
+      label: The PC's distribution and desktop
+      placeholder: Fedora 45, KDE Plasma 6.8
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: status
+    attributes:
+      label: torporctl status
+      description: The output of `torporctl status --json` on the PC.
+      render: json
+  - type: textarea
+    id: logs
+    attributes:
+      label: Home Assistant log lines
+      description: >-
+        Lines that mention `custom_components.torpor`. They name the PC and show IP addresses;
+        replace those if you'd rather not share them.
+      render: text

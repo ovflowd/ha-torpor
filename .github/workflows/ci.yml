@@ -1,0 +1,96 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          python-version: "3.14"
+      - name: Install
+        run: uv sync --locked
+      - name: Lint
+        run: uv run ruff check .
+      - name: Check the formatting
+        run: uv run ruff format --check .
+
+  test:
+    name: Python ${{ matrix.python }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.14"]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install
+        run: uv sync --locked
+      - name: Test
+        run: uv run pytest --cov=custom_components.torpor --cov-report=term-missing --cov-fail-under=95
+      - name: Check the config flow's coverage
+        run: uv run coverage report --include=custom_components/torpor/config_flow.py --fail-under=100
+
+  e2e:
+    name: End to end with the agent from ovflowd/torpor
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ovflowd/torpor
+          path: torpor
+          persist-credentials: false
+      - name: Install the agent's distribution packages
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends python3 python3-gi gir1.2-glib-2.0 \
+            gir1.2-soup-3.0 python3-cryptography dbus-daemon
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          python-version: "3.14"
+      - name: Install
+        run: uv sync --locked
+      - name: Test
+        run: uv run pytest tests/e2e
+        env:
+          TORPOR_CHECKOUT: ${{ github.workspace }}/torpor
+          TORPOR_PYTHON: /usr/bin/python3
+          TORPOR_E2E_REQUIRED: "1"
+
+  protocol:
+    name: Protocol matches ovflowd/torpor
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Compare SHA256SUMS with ovflowd/torpor main
+        run: |
+          curl --fail --silent --show-error --location \
+            https://raw.githubusercontent.com/ovflowd/torpor/main/tests/vectors/SHA256SUMS \
+            --output "$RUNNER_TEMP/SHA256SUMS"
+          diff -u "$RUNNER_TEMP/SHA256SUMS" tests/vectors/SHA256SUMS

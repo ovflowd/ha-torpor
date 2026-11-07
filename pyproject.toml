@@ -1,0 +1,44 @@
+[project]
+name = "ha-torpor"
+version = "0.1.0"
+description = "Home Assistant integration for Torpor: see, sleep, wake and dim your Linux PC"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Claudio Wunder", email = "cwunder@gnome.org" }]
+requires-python = ">=3.14.2"
+dependencies = []
+
+[project.urls]
+Repository = "https://github.com/ovflowd/ha-torpor"
+
+[tool.uv]
+package = false
+
+[dependency-groups]
+dev = [
+    "pytest-cov>=7",
+    "pytest-homeassistant==2026.11.0",
+    "ruff>=0.8",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+addopts = "-p no:respx"
+pythonpath = ["."]
+testpaths = ["tests"]
+filterwarnings = [
+    "ignore::DeprecationWarning:homeassistant.components.http.server",
+    "ignore::DeprecationWarning:backoff.*",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py314"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM", "RUF"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["custom_components"]

@@ -1,0 +1,14 @@
+name: Feature request or question
+description: An idea, or something that is not clear from the docs
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What would you like, or what is unclear?
+      description: Say what you are trying to do, not only the change you have in mind.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: What have you tried?

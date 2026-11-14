@@ -18,7 +18,7 @@ package = false
 [dependency-groups]
 dev = [
     "pytest-cov>=7",
-    "pytest-homeassistant==2026.11.0",
+    "pytest-homeassistant==2026.11.1",
     "ruff>=0.8",
 ]
 
